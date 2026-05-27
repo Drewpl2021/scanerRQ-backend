@@ -1,0 +1,12 @@
+# Entorno virtual
+venv_tesis/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Archivos temporales Python
+__pycache__/
+*.pyc
+
+# Outputs opcional si no quieres subir resultados pesados
+# outputs/
