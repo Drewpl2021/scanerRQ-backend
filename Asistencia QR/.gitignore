@@ -1,0 +1,17 @@
+# Entorno virtual
+venv/
+venv_tesis/
+
+# Variables de entorno
+.env
+
+# Repositorios embebidos / subproyectos
+asistencia-scanner/
+dashboard-asistencia/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Archivos temporales Python
+__pycache__/
+*.pyc
