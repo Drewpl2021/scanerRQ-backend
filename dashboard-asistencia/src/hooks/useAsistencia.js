@@ -7,7 +7,7 @@ import {
   getTotalAsistencias
 } from '../api';
 
-export default function useAsistencia(eventoId) {
+export default function useAsistencia(eventoId, fecha) {
   const [data, setData] = useState({
     salones: [],
     ranking: [],
@@ -22,11 +22,11 @@ export default function useAsistencia(eventoId) {
     if (!eventoId) return;
     try {
       const [salones, ranking, niveles, parientes, total] = await Promise.all([
-        getEstadisticasSalones(eventoId),
-        getRankingPrimeros(eventoId),
-        getEstadisticasNiveles(eventoId),
-        getEstadisticasParientes(eventoId),
-        getTotalAsistencias(eventoId),
+        getEstadisticasSalones(eventoId, fecha),
+        getRankingPrimeros(eventoId, fecha),
+        getEstadisticasNiveles(eventoId, fecha),
+        getEstadisticasParientes(eventoId, fecha),
+        getTotalAsistencias(eventoId, fecha),
       ]);
       setData({
         salones: salones.data,
@@ -41,11 +41,11 @@ export default function useAsistencia(eventoId) {
     } finally {
       setLoading(false);
     }
-  }, [eventoId]);
+  }, [eventoId, fecha]);
 
   useEffect(() => {
     fetchData();
-    const intervalo = setInterval(fetchData, 30000); // cada 30 segundos
+    const intervalo = setInterval(fetchData, 30000);
     return () => clearInterval(intervalo);
   }, [fetchData]);
 

@@ -29,18 +29,27 @@ export default function ParienteScreen({ navigation, route }) {
       Alert.alert(
         '✅ Asistencia registrada',
         `${alumno.nombres} ${alumno.apellidos}\nAcompañado por: ${parienteSeleccionado}`,
-        [{ text: 'Registrar otro', onPress: () => navigation.navigate('Scanner', { evento }) }]
+        [{
+          text: 'Registrar otro',
+          onPress: () => {
+            setParienteSeleccionado(null); // ← Limpia selección
+            setLoading(false);             // ← Resetea loading
+            navigation.navigate('Scanner', { evento });
+          }
+        }]
       );
     } catch (error) {
       const msg = error.response?.data?.detail || 'Error al registrar';
       Alert.alert('❌ Error', msg, [
-        { text: 'Volver', onPress: () => navigation.goBack() }
+        { text: 'Volver', onPress: () => {
+          setLoading(false);  // ← Resetea loading en error también
+          navigation.goBack();
+        }}
       ]);
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <View style={styles.container}>
       <View style={styles.alumnoCard}>

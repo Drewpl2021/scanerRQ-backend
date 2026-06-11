@@ -7,11 +7,19 @@ import NivelesChart from './components/NivelesChart';
 import ParientesChart from './components/ParientesChart';
 import RankingTable from './components/RankingTable';
 import './App.css';
+import BotonExcel from './components/BotonExcel';
+import BotonExcelPorcentaje from './components/BotonExcelPorcentaje';
+
 
 export default function App() {
+  const hoy = new Date().toISOString().split('T')[0];
   const [eventos, setEventos] = useState([]);
   const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
-  const { data, loading, ultimaActualizacion, refetch } = useAsistencia(eventoSeleccionado?.id);
+  const [fecha, setFecha] = useState(hoy);
+  const { data, loading, ultimaActualizacion, refetch } = useAsistencia(
+    eventoSeleccionado?.id,
+    fecha
+  );
 
   useEffect(() => {
     getEventos().then(res => {
@@ -25,12 +33,14 @@ export default function App() {
 
   return (
     <div className="app">
+
       {/* Sidebar */}
       <aside className="sidebar">
         <div className="sidebar-logo">
           <div className="logo-icon">📋</div>
           <span className="logo-text">AsistenciaQR</span>
         </div>
+
         <nav className="sidebar-nav">
           <div className="nav-label">Evento activo</div>
           {eventos.map(ev => (
@@ -43,7 +53,33 @@ export default function App() {
               {ev.nombre}
             </button>
           ))}
+
+          {/* Filtro de fecha */}
+          <div className="nav-label" style={{ marginTop: 24 }}>Filtrar por fecha</div>
+          <input
+            type="date"
+            value={fecha}
+            onChange={e => setFecha(e.target.value)}
+            style={{
+              width: '100%', padding: '8px 10px', borderRadius: 8,
+              background: '#1e293b', color: '#fff',
+              border: '1px solid #334155', fontSize: 13, cursor: 'pointer'
+            }}
+          />
+          <button
+            onClick={() => setFecha(hoy)}
+            style={{
+              width: '100%', marginTop: 6, padding: '7px',
+              background: fecha === hoy ? '#1d4ed8' : '#1e293b',
+              color: '#fff', border: '1px solid #334155',
+              borderRadius: 8, fontSize: 12, cursor: 'pointer',
+              transition: 'all 0.15s'
+            }}
+          >
+            📅 Ver hoy
+          </button>
         </nav>
+
         <div className="sidebar-footer">
           {ultimaActualizacion && (
             <div className="update-info">
@@ -57,22 +93,33 @@ export default function App() {
         </div>
       </aside>
 
-      {/* Main content */}
+      {/* Main */}
       <main className="main">
-        {/* Header */}
-        <header className="main-header">
-          <div>
-            <h1 className="main-title">Dashboard de Asistencia</h1>
-            <p className="main-sub">
-              {eventoSeleccionado?.nombre} · {eventoSeleccionado?.fecha_inicio}
-            </p>
-          </div>
-          <div className="live-badge">
-            <span className="live-dot"></span>
-            En vivo
-          </div>
-        </header>
-
+       <header className="main-header">
+  <div>
+    <h1 className="main-title">Dashboard de Asistencia</h1>
+    <p className="main-sub">
+      {eventoSeleccionado?.nombre} · {fecha === hoy ? '📅 Hoy' : `📅 ${fecha}`}
+    </p>
+  </div>
+  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+    <BotonExcelPorcentaje
+      eventoId={eventoSeleccionado?.id}
+      eventoNombre={eventoSeleccionado?.nombre || 'evento'}
+      fecha={fecha}
+    />
+    <BotonExcel
+      eventoId={eventoSeleccionado?.id}
+      eventoNombre={eventoSeleccionado?.nombre || 'evento'}
+      fecha={fecha}
+      estadisticas={data}
+    />
+    <div className="live-badge">
+      <span className="live-dot"></span>
+      En vivo
+    </div>
+  </div>
+</header>
         {/* Métricas */}
         <div className="metrics-grid">
           <MetricCard
@@ -86,7 +133,9 @@ export default function App() {
             icon="⏰"
             label="Primer registro"
             value={loading ? '...' : primerRegistro?.hora || '—'}
-            sub={primerRegistro ? `${primerRegistro.nombre} ${primerRegistro.apellido}` : 'Sin registros aún'}
+            sub={primerRegistro
+              ? `${primerRegistro.nombre} ${primerRegistro.apellido}`
+              : 'Sin registros aún'}
             color="#10b981"
           />
           <MetricCard
@@ -100,7 +149,9 @@ export default function App() {
             icon="🏆"
             label="Nivel más puntual"
             value={loading ? '...' : nivelMasTemprano?.nivel || '—'}
-            sub={nivelMasTemprano ? `${nivelMasTemprano.total_asistencias} asistencias` : ''}
+            sub={nivelMasTemprano
+              ? `${nivelMasTemprano.total_asistencias} asistencias`
+              : ''}
             color="#8b5cf6"
           />
         </div>
